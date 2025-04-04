@@ -1,0 +1,33 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Prisma schema for the chat app
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String    @unique
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Message Message[] @relation("SentMessages")
+  Messages Message[] @relation("ReceivedMessages")
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  text      String   // The message text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  senderId  String      // ID of the user who sent the message
+  receiverId String     // ID of the user who received the message
+  sender    User     @relation("SentMessages", fields: [senderId], references: [username])
+  receiver  User     @relation("ReceivedMessages", fields: [receiverId], references: [username])
+}
+
